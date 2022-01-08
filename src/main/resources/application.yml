@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/ktv?characterEncoding=utf-8
+    #    url: jdbc:oracle:thin:@127.0.0.1:1521:orcl //连接oracle数据库
+    username: root
+    password: root
+    #    username: hr
+    #    password: hr
+    driver-class-name: com.mysql.jdbc.Driver
+    #    driver-class-name: oracle.jdbc.driver.OracleDriver //oracle驱动
+    type: com.alibaba.druid.pool.DruidDataSource
+
+mybatis:
+  mapper-locations: mappers/*.xml #扫描映射文件
+  configuration:
+    map-underscore-to-camel-case: true #设置驼峰映射
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #输出mapper中的sql语句
+  type-aliases-package: com.music.pojo #配置别名
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+
+  supportMethodsArguments: true
+  params: count=countSql
+
+server:
+  port: 8088 #设置端口号
+#  servlet:
+#    context-path: springboot #设置项目访问路径

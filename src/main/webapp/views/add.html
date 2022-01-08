@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/vue-2.6.16.js"></script>
+    <script src="js/axios-0.18.0.js"></script>
+</head>
+<body>
+<center>
+    <div id="add">
+        <table border="1" rules="all">
+            <tr>
+                <td>网易云音乐地址前缀</td>
+                <td>https://music.163.com/song/media/outer/url?id=</td>
+            </tr>
+            <tr>
+                <td>歌曲</td>
+                <td><input type="text" v-model="song.name"></td>
+            </tr>
+            <tr>
+                <td>路径</td>
+                <td><textarea v-model="song.url" cols="55"></textarea></td>
+            </tr>
+            <tr align="center">
+                <td colspan="100"><button @click="add()">添加</button></td>
+            </tr>
+        </table>
+    </div>
+</center>
+</body>
+<script>
+    new Vue({
+        el: '#add',
+        data: {
+            song: {},
+        },
+        methods: {
+            add: function () {
+                var _this = this;
+                    axios.post("/music/addSong", _this.song).then(function (result) {
+                    if(result.data == 'ok') {
+                        location.reload();
+                    }else {
+                        alert("添加失败");
+                    }
+                })
+            }
+        }
+    })
+</script>
+</html>

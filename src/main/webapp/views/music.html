@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>music</title>
+    <script src="/views/js/jquery-1.8.2.js"></script>
+    <style>
+        body {
+            background-image: url("http://localhost:8088/views/img/zjj.png");
+            /*https://www.nianyunzm.com/wp-content/uploads/2021/01/%E6%8B%AF%E6%95%91%E5%A7%AC2.png*/
+            background-size: 100%;
+            background-repeat: no-repeat;
+            zoom: 1.75;
+        }
+
+        #end {
+            display: none;
+        }
+
+        #screen {
+            color: aqua;
+            font-weight: bold;
+            display: block;
+            border: 1px solid aqua;
+            border-radius: 5px;
+            background-color: white;
+            width: 118px;
+            height: 17px;
+            font-size: 15px;
+            text-align: center;
+            line-height: 17px;
+            position: absolute;
+            top: 27px;
+        }
+
+        #btns {
+            position: relative;
+            width: 135px;
+            height: 55px;
+            float: right;
+        }
+
+        #song {
+            width: 240px;
+        }
+
+        .anniu {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .btn {
+            color: aqua;
+            font-weight: bold;
+            border-color: aqua;
+            border-radius: 5px;
+            background-color: white;
+            width: 120px;
+            /*height: 23px;*/
+            text-align: center;
+            line-height: 17px;
+            outline: pink;
+        }
+
+        #ktv {
+            width: 450px;
+            /*margin-top: 100px;*/
+            margin-left: 15px;
+            padding: 20px;
+            border: solid skyblue 3px;
+            border-radius: 7px;
+            position: relative;
+        }
+
+        #play {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            width: 150px;
+            height: 100px;
+            text-align: center;
+            line-height: 30px;
+            height: 30px;
+            background-color: rgba(170, 221, 254, 0.7);
+        }
+
+        #flag {
+            margin-top: 3px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .page {
+            font-size: 12px;
+            color: aqua;
+            border-color: aqua;
+            border-radius: 5px;
+            background-color: black;
+        }
+
+        #paper {
+            color: aqua;
+            background-color: rgba(170, 221, 254, 0.7);
+        }
+
+        #fuzzy-query {
+            width: 236px;
+            height: 25px;
+            background-color: aqua;
+            border-radius: 4px;
+            margin-bottom: 1px;
+        }
+
+        .like {
+            outline: none;
+            line-height: 23px;
+            text-align: center;
+            font-weight: bold;
+            border: 0;
+        }
+
+        ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+            color: rgba(0, 255, 255, 0.5);
+            /*font-weight: initial;*/
+        }
+
+        #like {
+            float: right;
+            width: 54px;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            background-color: black;
+            color: aqua;
+            cursor: pointer;
+        }
+
+        #name {
+            float: left;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            background-color: black;
+            color: aqua;
+        }
+
+        #color {
+            position: absolute;
+            top: 10px;
+            left: -50px;
+            width: 20px;
+            height: 100px;
+            /*background-color: white;*/
+            font-size: 12px;
+            color: aqua;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        #colorBtn {
+            width: 20px;
+            height: 20px;
+            background-color: rgba(255, 255, 255, 0);
+            border: none;
+            border-radius: 100%;
+            display: none;
+        }
+
+        .clock {
+            margin-top: 15px;
+            background-color: white;
+            color: aqua;
+            width: 40px;
+            font-size: 8px;
+            font-weight: bold;
+            line-height: 15px;
+            text-align: center;
+            border: 1px solid aqua;
+            border-radius: 5px;
+            position: absolute;
+            transition: all 0.1s;
+            cursor: pointer;
+            /*transform: translateX(0px);*/
+            /*transform: translateY(210px);*/
+        }
+
+        #clock1 {
+            left: -25px;
+            top: -25px;
+        }
+
+        #clock2 {
+            left: 300px;
+            top: -25px;
+            /*transform: rotate(90deg);*/
+        }
+
+        #clock3 {
+            right: -25px;
+            top: 125px;
+            transform: rotate(90deg);
+        }
+
+        #clock4 {
+            left: 155px;
+            top: 145px;
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body>
+<marquee behavior="" direction="">
+    <h1 style="color: aqua">喵喵喵</h1>
+</marquee>
+
+<div id="ktv">
+    <!--autoplay-->
+    <!--loop-->
+    <!--控制台-->
+    <div id="btns">
+        <audio src="" id="music"></audio>
+        <input type="button" value="播放" id="start" class="btn anniu">
+        <input type="button" value="暂停" id="end" class="btn anniu">
+        <span id="screen">00:00</span>
+        <!--字幕-->
+        <marquee id="play" scrollamount="3"></marquee>
+
+        <div id="color">
+            <span id="colorFlag" style="cursor: pointer;">修改主题色</span>
+            <input type="color" id="colorBtn">
+        </div>
+    </div>
+
+    <!--歌曲-->
+    <div id="song">
+        <div id="fuzzy-query" style="border: 2px solid aqua;">
+            <input type="text" placeholder="请输入" class="like theme" id="name">
+            <input type="button" class="like theme" id="like" value="查询">
+        </div>
+        <div id="flag">
+            <button class="page first-last theme">首页</button>
+            <button class="page prev-next theme">上一页</button>
+            <span id="paper"></span>
+            <button class="page prev-next theme">下一页</button>
+            <button class="page first-last theme">尾页</button>
+        </div>
+    </div>
+
+    <!--歌词-->
+    <div id="lyric">
+        <!--不会写-->
+    </div>
+
+    <!--小特效-->
+    <div id="clock1" class="clock theme">喵喵喵</div>
+    <div id="clock2" class="clock theme">喵喵喵</div>
+    <div id="clock3" class="clock theme">喵喵喵</div>
+    <div id="clock4" class="clock theme">喵喵喵</div>
+</div>
+</body>
+<script>
+    // https://github.com/death-Soul/music.git
+    //要获取的按钮等元素
+    var body;
+    var start;
+    var end;
+    var screen;
+    var set;
+    var pageNum = 1;
+    var maxPage = 0;
+    var color;
+    var animation;
+    var rotateSet;
+    var setTwo;
+
+    $(function () {
+        $.post("/music/getColor", null, function (result) {
+            color = result;
+            $("#colorBtn").val(result);
+            $(".theme").css("background-color", result);
+        });
+
+        //页面初始化时禁用播放按钮
+        $("#start").attr("disabled", true);
+
+        //给按钮等元素赋值
+        body = document.body;
+        start = $("#start");
+        end = $("#end");
+        screen = $("#screen");
+
+        //播放按钮添加点击事件，调用计时器函数
+        start.click(function () {
+            clearInterval(set);
+            jishiqi();
+            rotate();
+            music.play();
+        })
+
+        //暂停按钮添加点击事件，实现点击删除上述的计时器set
+        end.click(function () {
+            var music = document.querySelector("#music");
+            screen.html(screen.html());
+            clearInterval(rotateSet);
+            if ($("#music").attr("src") != '') {
+                music.pause();
+            }
+            end.css("display", "none");
+            start.css("display", "inline-block");
+            start.attr("disabled", false);
+        })
+
+        //页面初始化调用查询歌曲方法，实现页面一加载展示第一页歌曲
+        selectAllSong(1, $("#name").val(), 6);
+
+        //给分页按钮绑定点击事件，实现点击时根据上一页下一页功能
+        $(".page").click(function () {
+            var text = this.innerHTML;
+            if (text == "首页") {
+                pageNum = 1;
+                selectAllSong(pageNum, $("#name").val(), 6);
+            } else if (text == "上一页") {
+                if (pageNum <= 1) {
+                    // alert("已经是第一页")
+                    pageNum = maxPage;
+                } else {
+                    pageNum--;
+                }
+                selectAllSong(pageNum, $("#name").val(), 6);
+            } else if (text == "下一页") {
+                if (pageNum >= maxPage) {
+                    // alert("已经是最后一页")
+                    pageNum = 1;
+                } else {
+                    pageNum++;
+                }
+                selectAllSong(pageNum, $("#name").val(), 6);
+            } else if (text == "尾页") {
+                pageNum = maxPage;
+                selectAllSong(pageNum, $("#name").val(), 6);
+            }
+        })
+
+        //查询按钮绑定点击事件实现模糊查询
+        $("#like").click(function () {
+            if ($("#name").val() != "") {
+                selectAllSong(1, $("#name").val(), 6);
+            }
+        })
+
+        //鼠标摁下事件
+        $("#like").mousedown(function () {
+            $("#like").css("backgroundColor", "white");
+        })
+
+        //鼠标抬起事件
+        $("#like").mouseup(function () {
+            var color = $("#colorBtn").val();
+            $("#like").css("backgroundColor", color);
+        })
+
+        //给文本框绑定键盘摁下事件，实现歌曲根据文本框输入内容实时查询歌曲，优化用户体验
+        $("#name").keyup(function () {
+            selectAllSong(1, $("#name").val(), 6);
+        })
+
+        //給文本框绑定失去焦点事件实现文本框失去焦点时根据文本框内容模糊查询，优化用户体验
+        $("#name").blur(function () {
+            if ($("#name").val() != "" && $("#name").val() != null) {
+                selectAllSong(1, $("#name").val(), 6);
+            }
+        })
+
+        //颜色域失焦事件，实现修改主题色
+        $("#colorBtn").blur(function () {
+            var nowColor = $("#colorBtn").val();
+            $.post("/music/updateColor", "color=" + nowColor, function (result) {
+                if (result == "ok") {
+                    $(".theme").css("background-color", nowColor);
+                    $(".clock").css("background-color", nowColor);
+                    color = nowColor;
+                }
+            });
+        })
+        $("#colorFlag").click(function () {
+            if ($("#colorBtn").css("display") == 'none') {
+                $("#colorBtn").css("display", "inline-block");
+            } else {
+                $("#colorBtn").css("display", "none");
+            }
+        })
+
+        //小特效点击修改颜色
+        $(".clock").click(function () {
+            if (this.style.backgroundColor == 'white') {
+                this.style.backgroundColor = color;
+            } else {
+                this.style.backgroundColor = "white";
+            }
+        })
+    })
+
+    //封装计时器的函数，方便开启计时器
+    function jishiqi() {
+        var music = document.querySelector("#music");
+        var flag = false;   //定义标志
+        var time;
+
+        set = setInterval(function () {
+            /*实现外部设备（蓝牙耳机，线控耳机，触摸板，快捷键）暂停
+            |播放歌曲时计时器关闭|开启，和播放|暂停按钮的互相转换*/
+            var str = screen.html();
+            var arr = str.split(":")
+            time = str;
+            if (arr[1] >= 59) {
+                arr[1] = 0;
+                // screen.html((parseInt(arr[0]) + 1) + ":" + arr[1]);
+                if (parseInt(arr[0]) >= 9) {
+                    screen.html((parseInt(arr[0]) + 1) + ":" + arr[1] + "0");
+                } else {
+                    screen.html("0" + (parseInt(arr[0]) + 1) + ":" + arr[1] + "0");
+                }
+
+            } else {
+                if (parseInt(arr[1]) >= 9) {
+                    screen.html(arr[0] + ":" + (parseInt(arr[1]) + 1));
+                } else {
+                    screen.html(arr[0] + ":0" + (parseInt(arr[1]) + 1));
+                }
+            }
+
+            //获取歌曲是否播放的Boolean值并赋值给标志flag
+            flag = music.paused;
+
+            if (flag == true) {     //flag为true时，歌曲停止播放，修改页面按钮样式，计数器停止计数
+                screen.html(time);
+                end.css("display", "none");
+                start.css("display", "inline-block");
+                start.attr("disabled", false);
+                //停止页面旋转小特效
+                clearInterval(rotateSet);
+                rotateSet = 0;  //清楚后赋值为零，避免计时器里重复开启
+
+            } else {                //flag为false时，歌曲开始播放，修改页面样式
+                start.css("display", "none");
+                end.css("display", "inline-block");
+                /*清除后赋值为0进行判断，因为计时器开启后返回数值类--
+                型并做++，判断不为0，可以避免多次调用无法关闭的bug*/
+                if (rotateSet == 0) {
+                    rotate();
+                }
+            }
+        }, 1000);
+
+        //播放|暂停按钮互换样式
+        start.css("display", "none");
+        end.css("display", "inline-block");
+    }
+
+    var number = 0;     //当前页码
+    var bigName = "";   //模糊查询文本框的值
+
+    //ajax异步查询歌曲
+    function selectAllSong(pageNum, name, pageSize) {
+        number = pageNum;
+        bigName = name;
+        $(".song").remove();
+        //Ajax异步请求歌曲
+        $.post("/music/selectAllSong", "pageNum=" + pageNum + "&name=" + name + "&pageSize=" + pageSize, function (result) {
+
+            var data = result.data;     //获取当前页码的歌曲
+            maxPage = result.maxPage;   //获取最大页码数
+
+            //循环追加歌曲生成的按钮到点歌台
+            //中文字符正则
+            var reg = /[^\u4E00-\u9FA5]/;
+            for (var i in data) {
+                if (reg.test(data[i].name) != true) {
+                    if (data[i].name.length > 7) {
+                        $("#flag").before("<button value='" + data[i].url + "' class='btn song' name='" + data[i].name + "'>" + data[i].name.substr(0, 6) + "...</button>");
+                    } else {
+                        $("#flag").before("<button value='" + data[i].url + "' class='btn song'>" + data[i].name + "</button>");
+                    }
+                } else {
+                    if (data[i].name.length > 15) {
+                        $("#flag").before("<button value='" + data[i].url + "' class='btn song' name='" + data[i].name + "'>" + data[i].name.substr(0, 12) + "...</button>");
+                    } else {
+                        $("#flag").before("<button value='" + data[i].url + "' class='btn song'>" + data[i].name + "</button>");
+                    }
+                }
+            }
+
+            //显示当前第几页
+            $("#paper").html("[" + pageNum + "/" + maxPage + "]");
+
+            $(".song").mouseover(function () {
+                var text = this.innerText;
+                if (text.includes("...")) {
+                    var name = this.name;
+                    this.innerText = name;
+                    this.name = text;
+                }
+            })
+
+            $(".song").mouseout(function () {
+                var name = this.name;
+                if (name.includes("...")) {
+                    var text = this.innerText;
+                    this.innerText = name;
+                    this.name = text;
+                }
+            })
+
+            //给每一首歌曲对应的按钮添加点击事件，实现点歌功能
+            $(".song").click(function () {
+                var _this = this;
+
+                //点歌前删除计时器，避免bug
+                clearInterval(set);
+                clearInterval(rotateSet);
+                clearInterval(setTwo);
+
+                //获取点击的歌曲按钮的value值（歌曲路径）
+                var song = _this.value;
+
+                //实现歌曲播放功能
+                $("#music").attr("src", song);
+                $("#music").attr("autoplay", "autoplay");
+                screen.html("00:00");
+
+                //重新调用计时器
+                jishiqi();
+                //开启旋转小特效
+                rotate();
+
+                var music = document.querySelector("#music");
+                setTwo = setInterval(function () {
+                    if (music.paused == true) {          //未播放
+                        //提示用户歌曲未收录
+                        $("#play").html("亲！出错了呢！");
+                        $("#play").css("color", "#F62C59");
+                        clearInterval(set);
+                        clearInterval(rotateSet);
+                        end.css("display", "none");
+                        start.css("display", "inline-block");
+                        start.attr("disabled", true);
+                        // clearInterval(setTwo);
+
+                    } else if (music.paused == false) {   //播放
+                        //修改歌曲屏幕的当前播放音乐
+                        $("#play").html("当前正在播放：" + "<span style='color: #ff69b4'>" + _this.innerHTML + "</span>");
+                        $("#play").css("color", "rgba(58, 110, 158, 1)");
+                        clearInterval(setTwo);
+                    }
+                }, 1000);
+            })
+        });
+    }
+
+    var translate = (flag, element, degree) => {
+        //获取偏移量
+        var left = element.css("left");
+        var top = element.css("top");
+        left = left.substr(0, left.length - 2);
+        top = top.substr(0, top.length - 2);
+        //获取ktv的宽
+        var width = $("#ktv").css("width");
+        width = width.substr(0, width.length - 2);
+        width = Number.parseInt(width) + 23;
+        //获取ktv的高
+        var height = $("#ktv").css("height");
+        height = height.substr(0, height.length - 2);
+        height = Number.parseInt(height) + 95;
+
+        animation = setInterval(function () {
+
+            if (flag == 1) {
+                element.css("left", left++ + "px");
+                if (left >= width) {
+                    degree += 90;
+                    element.css("transform", "rotate(" + degree + "deg)");
+                    flag = 2;
+                }
+            }
+
+            if (flag == 2) {
+                element.css("top", top++ + "px");
+                if (top >= height) {
+                    degree += 90;
+                    element.css("transform", "rotate(" + degree + "deg)");
+                    flag = 3;
+                }
+            }
+
+            if (flag == 3) {
+                element.css("left", left-- + "px");
+                if (left <= -25) {
+                    degree += 90;
+                    element.css("transform", "rotate(" + degree + "deg)");
+                    flag = 4;
+                }
+            }
+
+            if (flag == 4) {
+                element.css("top", top-- + "px");
+                if (top <= -25) {
+                    degree += 90;
+                    element.css("transform", "rotate(" + degree + "deg)");
+                    flag = 1;
+                }
+            }
+        }, 20);
+    }
+
+    translate(1, $("#clock1"), 0);
+    translate(1, $("#clock2"), 0);
+    translate(2, $("#clock3"), 90);
+    translate(3, $("#clock4"), 180);
+
+    function rotate() {
+        var degree = 0;
+        rotateSet = setInterval(function () {
+            degree += 180;
+            $(".clock").css("transform", "rotate(" + degree + "deg)")
+        }, 50);
+    }
+</script>
+</html>

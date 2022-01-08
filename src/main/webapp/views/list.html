@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/vue-2.6.16.js"></script>
+    <script src="js/axios-0.18.0.js"></script>
+    <style>
+        body {
+            zoom: 1.25;
+        }
+    </style>
+</head>
+<body>
+<center>
+    <div id="list">
+        <table border="1" rules="all">
+            <tr align="center">
+                <td colspan="100"><input type="text" id="name">
+                    <button @click="selectAllSong()">查询</button>
+                </td>
+            </tr>
+            <tr align="center" bgcolor="aqua">
+                <th>编号</th>
+                <th>名称</th>
+                <th>歌曲路径</th>
+            </tr>
+            <tr align="center" v-for="s in list">
+                <td>
+                    {{s.id}}
+                </td>
+                <td>
+                    <span @click="hiddenName($event)" class="nameSpan" v-if="s.name != '' ">{{s.name}}</span>
+                    <span @click="hiddenUrl($event)" class="urlSpan" v-if="s.name == '' ">暂时没有呢亲！</span>
+                    <input type="text" style="display: none;" v-model="name" @blur="updateName($event, s.id)"
+                           class="nameInput">
+                </td>
+                <td>
+                    <span @click="hiddenUrl($event)" class="urlSpan" v-if="s.url != '' ">{{s.url}}</span>
+                    <span @click="hiddenUrl($event)" class="urlSpan" v-if="s.url == '' ">暂时没有呢亲！</span>
+                    <input type="text" style="display: none; width: 500px;" v-model="url" @blur="updateUrl($event, s.id)"
+                           class="urlInput">
+                </td>
+            </tr>
+            <tr align="center">
+                <td colspan="100">
+                    <button @click="pagIng(1)">首页</button>
+                    <button @click="pagIng(pageNum - 1)">上一页</button>
+                    <span>[{{pageNum}}/{{maxPage}}]共{{total}}条数据</span>
+                    <button @click="pagIng(pageNum + 1)">下一页</button>
+                    <button @click="pagIng(maxPage)">尾页</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</center>
+</body>
+<script>
+    new Vue({
+        el: '#list',
+        data: {
+            song: {},
+            list: [],
+            pageNum: 1,
+            maxPage: 0,
+            total: 0,
+            name: '',
+            url: '',
+            object: {},
+        },
+        methods: {
+            selectAllSong: function () {
+                var _this = this;
+                var name = document.querySelector("#name");
+                axios.post("/music/selectAllSong?pageNum=" + _this.pageNum + "&name=" + name.value).then(function (result) {
+                    _this.list = result.data.data;
+                    _this.maxPage = result.data.maxPage;
+                    _this.total = result.data.total;
+                })
+            },
+            pagIng: function (pageNum) {
+                if (pageNum == 0 || pageNum > this.maxPage) {
+                    pageNum = 1;
+                }
+                this.pageNum = pageNum;
+                this.selectAllSong();
+            },
+            hiddenName: function (event) {
+                var nameSpan = document.getElementsByClassName("nameSpan");
+                var nameInput = document.getElementsByClassName("nameInput");
+                for (var i = 0; i < nameSpan.length; i++) {
+                    nameSpan[i].style.display = "inline-block";
+                    nameInput[i].style.display = "none";
+                }
+                event.target.style.display = "none";
+                event.target.nextElementSibling.style.display = "inline-block";
+                event.target.nextElementSibling.value = event.target.innerText;
+            },
+            hiddenUrl: function (event) {
+                var urlSpan = document.getElementsByClassName("urlSpan");
+                var urlInput = document.getElementsByClassName("urlInput");
+                for (var i = 0; i < urlSpan.length; i++) {
+                    urlSpan[i].style.display = "inline-block";
+                    urlInput[i].style.display = "none";
+                }
+                event.target.style.display = "none";
+                event.target.nextElementSibling.style.display = "inline-block";
+                event.target.nextElementSibling.value = event.target.innerText;
+            },
+            updateName: function (event, id) {
+                this.object.id = id;
+                this.object.name = this.name;
+                if(this.name != null && this.name != '') {
+                    var _this = this;
+                    axios.post("/music/updateNameById", _this.object).then(function (result) {
+                        if(result.data == "ok") {
+                            _this.selectAllSong();
+                        }else {
+                            alert("失败");
+                        }
+                    });
+                }
+                event.target.style.display = "none";
+                event.target.previousElementSibling.style.display = "inline-block";
+            },
+            updateUrl: function (event, id) {
+                this.object.id = id;
+                this.object.url = this.url;
+                if(this.url != null && this.url != '') {
+                    var _this = this;
+                    axios.post("/music/updateUrlById", _this.object).then(function (result) {
+                        if(result.data == "ok") {
+                            _this.selectAllSong();
+                        }else {
+                            alert("失败");
+                        }
+                    });
+                }
+                event.target.style.display = "none";
+                event.target.previousElementSibling.style.display = "inline-block";
+            }
+        },
+        created: function () {
+            this.selectAllSong();
+        }
+    })
+</script>
+</html>
