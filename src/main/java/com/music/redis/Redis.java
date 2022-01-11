@@ -12,9 +12,9 @@ public class Redis {
     private static Jedis jedis;
 
     static {
-        jedis = new Jedis("192.168.16.1", 6379);
+        jedis = new Jedis("127.0.0.1", 6379);
     }
-    
+
     public static Jedis getJedis() {
         return jedis;
     }

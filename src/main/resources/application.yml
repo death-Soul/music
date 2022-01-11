@@ -14,7 +14,7 @@ mybatis:
   mapper-locations: mappers/*.xml #扫描映射文件
   configuration:
     map-underscore-to-camel-case: true #设置驼峰映射
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #输出mapper中的sql语句
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #输出mapper中的sql语句
   type-aliases-package: com.music.pojo #配置别名
 pagehelper:
   helperDialect: mysql

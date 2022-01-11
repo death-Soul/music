@@ -208,6 +208,41 @@
             top: 145px;
             transform: rotate(180deg);
         }
+
+        #volume {
+            margin-top: 85px;
+            margin-left: 7px;
+            width: 105px;
+            height: 35px;
+        }
+
+        .volume {
+            color: aqua;
+            font-weight: bold;
+            border-color: aqua;
+            border-radius: 5px;
+            background-color: white;
+            text-align: center;
+            line-height: 12px;
+            outline: pink;
+            float: left;
+        }
+
+        .volumePhoto {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            float: left;
+            margin-top: 2.5px;
+            border: 1px solid white;
+        }
+
+        .lucency {
+            opacity: 0.2;
+        }
+        .translucence {
+            opacity: 0.6;
+        }
     </style>
 </head>
 <body>
@@ -227,6 +262,19 @@
         <!--字幕-->
         <marquee id="play" scrollamount="3"></marquee>
 
+        <!--音量控制-->
+        <div id="volume">
+            <div style="font-size: 5px; color: #ff69b4; text-align: center;">音量</div>
+            <button id="lossVolume" class="volume">-</button>
+            <span class="theme volumePhoto"></span>
+            <span class="theme volumePhoto"></span>
+            <span class="theme volumePhoto"></span>
+            <span class="theme volumePhoto"></span>
+            <span class="theme volumePhoto"></span>
+            <button id="addVolume" class="volume">+</button>
+        </div>
+
+        <!--修改主题颜色-->
         <div id="color">
             <span id="colorFlag" style="cursor: pointer;">修改主题色</span>
             <input type="color" id="colorBtn">
@@ -398,6 +446,53 @@
                 this.style.backgroundColor = color;
             } else {
                 this.style.backgroundColor = "white";
+            }
+        })
+
+        //音量控制
+        $("#lossVolume").click(function () {    //减小音量
+            var num;
+            //获取当前音量
+            var volume = String(document.querySelector("#music").volume);
+            if(volume == 1) {   //当音量为1时，让音量减0.1，因为音量为1时没有小数，不用切分数组对小数做处理
+                document.querySelector("#music").volume = volume - 0.1;
+                num = 9;    //音量为1时，给num赋值为9
+            }else if (volume > 0 && volume != 1) {  //音量为0时，已经静音
+                /* 小数相加减会丢失精度，所以采用切分数组的形式来对小数进行处理 */
+                var arr = String(volume).split(".");
+                num = Number(arr[1]) - 1;
+                //拼接0，把丢失的小数点加回来
+                document.querySelector("#music").volume = Number.parseFloat("0." + num);
+            }
+
+            var volumePhoto = $(".volumePhoto");
+            if(num % 2 == 0) {
+                volumePhoto.eq(num / 2).attr("class", "theme volumePhoto lucency");
+            }else {
+                volumePhoto.eq(Math.floor(num / 2)).attr("class", "theme volumePhoto translucence");
+            }
+        })
+        $("#addVolume").click(function () {    //增大音量
+            var num;
+            var volume = document.querySelector("#music").volume;
+            if(volume == 0) {   //当音量为0时，让音量加0.1，因为音量为0时没有小数，不用切分数组对小数做处理
+                document.querySelector("#music").volume = volume + 0.1;
+                num = 1;
+            }else if(document.querySelector("#music").volume == 0.9) {  //音量为0.9时，不用对小数处理，直接等于1
+                document.querySelector("#music").volume = 1;
+                num = 10;
+            }else if (volume < 1 && volume != 0) {  //音量为1时，已经是最大音量
+                /* 小数相加减会丢失精度，所以采用切分数组的形式来对小数进行处理 */
+                var arr = String(volume).split(".");
+                num = Number(arr[1]) + 1;
+                document.querySelector("#music").volume = Number.parseFloat("0." + num);
+            }
+
+            var volumePhoto = $(".volumePhoto");
+            if(num % 2 == 0) {
+                volumePhoto.eq((num - 1) / 2).attr("class", "theme volumePhoto");
+            }else {
+                volumePhoto.eq(Math.floor((num - 1) / 2)).attr("class", "theme volumePhoto translucence");
             }
         })
     })
