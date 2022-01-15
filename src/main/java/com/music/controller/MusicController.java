@@ -1,15 +1,14 @@
 package com.music.controller;
 
 import com.music.pojo.Song;
-import com.music.redis.Redis;
 import com.music.service.SongService;
 import com.music.utils.PagingResult;
+import com.music.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import redis.clients.jedis.Jedis;
 
 /**
  * 本类作者：贾伟杰
@@ -22,6 +21,8 @@ public class MusicController {
 
     @Autowired
     private SongService songService;
+    @Autowired
+    private RedisUtil redisUtil;
 
     @RequestMapping("/music")
     public String goMusic() {
@@ -37,16 +38,14 @@ public class MusicController {
     @RequestMapping("/getColor")
     @ResponseBody
     public String getColor() {
-        Jedis jedis = Redis.getJedis();
-        return jedis.get("color");
+        return (String) redisUtil.getObject("color");
     }
 
     @RequestMapping("/updateColor")
     @ResponseBody
     public String updateColor(String color) {
         try {
-            Jedis jedis = Redis.getJedis();
-            jedis.set("color", color);
+            redisUtil.putObject("color", color);
             return "ok";
         }catch (Exception e) {
             return "no";

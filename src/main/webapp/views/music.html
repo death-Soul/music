@@ -9,7 +9,7 @@
     <script src="/views/js/jquery-1.8.2.js"></script>
     <style>
         body {
-            background-image: url("http://localhost:8088/views/img/zjj.png");
+            background-image: url("http://192.168.1.156:8089/views/img/zjj.png");
             /*https://www.nianyunzm.com/wp-content/uploads/2021/01/%E6%8B%AF%E6%95%91%E5%A7%AC2.png*/
             background-size: 100%;
             background-repeat: no-repeat;
@@ -81,10 +81,9 @@
             top: 55px;
             right: 0;
             width: 150px;
-            height: 100px;
-            text-align: center;
-            line-height: 30px;
-            height: 30px;
+            height: 20px;
+            font-size: 14px;
+            line-height: 20px;
             background-color: rgba(170, 221, 254, 0.7);
         }
 
@@ -236,6 +235,22 @@
             margin-top: 2.5px;
             border: 1px solid white;
         }
+
+        #progressbarOne {
+            width: 150px;
+            height: 2px;
+            position: absolute;
+            top: 80px;
+            right: 0;
+            opacity: 0.2;
+        }
+        #progressbarTwo {
+            /*width: 150px;*/
+            height: 2px;
+            position: absolute;
+            top: 80px;
+            left: -15px;
+        }
     </style>
 </head>
 <body>
@@ -251,19 +266,25 @@
         <audio src="" id="music"></audio>
         <input type="button" value="播放" id="start" class="btn anniu">
         <input type="button" value="暂停" id="end" class="btn anniu">
-        <span id="screen">00:00</span>
+        <span id="screen">00:00:00</span>
         <!--字幕-->
         <marquee id="play" scrollamount="3"></marquee>
+
+        <!--进度条-->
+        <div id="progressbarOne" class="theme"></div>
+        <div id="progressbarTwo" class="theme"></div>
 
         <!--音量控制-->
         <div id="volume">
             <div style="font-size: 5px; color: #ff69b4; text-align: center;">音量</div>
             <button id="lossVolume" class="volume">-</button>
-            <span class="theme volumePhoto"></span>
-            <span class="theme volumePhoto"></span>
-            <span class="theme volumePhoto"></span>
-            <span class="theme volumePhoto"></span>
-            <span class="theme volumePhoto"></span>
+            <span class="theme">
+                <span class="theme volumePhoto"></span>
+                <span class="theme volumePhoto"></span>
+                <span class="theme volumePhoto"></span>
+                <span class="theme volumePhoto"></span>
+                <span class="theme volumePhoto"></span>
+            </span>
             <button id="addVolume" class="volume">+</button>
         </div>
 
@@ -493,38 +514,55 @@
         })
     })
 
+    //获取播放时间
+    function timeToMinute(times) {
+        var t;
+        if(times > -1) {
+            var hour = Math.floor(times / 3600);
+            var min = Math.floor(times / 60) % 60;
+            var sec = times % 60;
+            if(hour < 10) {
+                t = "0" + hour + ":";
+            }else {
+                t = hour + ":";
+            }
+
+            if(min < 10) {
+                t += "0";
+            }
+            t += min + ":";
+            if(sec < 10) {
+                t += "0";
+            }
+            t += sec.toFixed(2)
+        }
+        t = t.substring(0, t.length - 3);
+        return t;
+    }
+
     //封装计时器的函数，方便开启计时器
     function jishiqi() {
         var music = document.querySelector("#music");
         var flag = false;   //定义标志
         var time;
+        var duration = '';
+        var nowDuration = 0;
+        var numOne = 0;
+        var numTwo = 0;
 
         set = setInterval(function () {
-            /*实现外部设备（蓝牙耳机，线控耳机，触摸板，快捷键）暂停
-            |播放歌曲时计时器关闭|开启，和播放|暂停按钮的互相转换*/
-            var str = screen.html();
-            var arr = str.split(":")
-            time = str;
-            if (arr[1] >= 59) {
-                arr[1] = 0;
-                // screen.html((parseInt(arr[0]) + 1) + ":" + arr[1]);
-                if (parseInt(arr[0]) >= 9) {
-                    screen.html((parseInt(arr[0]) + 1) + ":" + arr[1] + "0");
-                } else {
-                    screen.html("0" + (parseInt(arr[0]) + 1) + ":" + arr[1] + "0");
-                }
-
-            } else {
-                if (parseInt(arr[1]) >= 9) {
-                    screen.html(arr[0] + ":" + (parseInt(arr[1]) + 1));
-                } else {
-                    screen.html(arr[0] + ":0" + (parseInt(arr[1]) + 1));
-                }
-            }
-
+            //获取当前播放时间
+            var currentTime = $("#music")[0].currentTime;
+            //调用转换方法，转换成00:00:00的格式(时，分，秒)
+            var nowTime = timeToMinute(currentTime);
+            screen.html(nowTime);
+            var arr = nowTime.split(":");
+            nowDuration = Number.parseInt(arr[1]) * 60 + Number.parseInt(arr[2]);
             //获取歌曲是否播放的Boolean值并赋值给标志flag
             flag = music.paused;
 
+            /*实现外部设备（蓝牙耳机，线控耳机，触摸板，快捷键）暂停
+            |播放歌曲时计时器关闭|开启，和播放|暂停按钮的互相转换*/
             if (flag == true) {     //flag为true时，歌曲停止播放，修改页面按钮样式，计数器停止计数
                 screen.html(time);
                 end.css("display", "none");
@@ -532,7 +570,7 @@
                 start.attr("disabled", false);
                 //停止页面旋转小特效
                 clearInterval(rotateSet);
-                rotateSet = 0;  //清楚后赋值为零，避免计时器里重复开启
+                rotateSet = 0;  //清除后赋值为零，避免计时器里重复开启
 
             } else {                //flag为false时，歌曲开始播放，修改页面样式
                 start.css("display", "none");
@@ -541,6 +579,16 @@
                 型并做++，判断不为0，可以避免多次调用无法关闭的bug*/
                 if (rotateSet == 0) {
                     rotate();
+                }
+                if(duration == '') {
+                    duration = $("#music")[0].duration;
+                    var arr = timeToMinute(duration).split(":");
+                    duration = Number.parseInt(arr[1]) * 60 + Number.parseInt(arr[2]);
+                    duration = duration / 100;
+                }
+                if(nowDuration > duration * numTwo) {
+                    numTwo++;
+                    $("#progressbarTwo").css("width", (numOne += 1.5) + "px");
                 }
             }
         }, 1000);
@@ -570,15 +618,15 @@
             for (var i in data) {
                 if (reg.test(data[i].name) != true) {
                     if (data[i].name.length > 7) {
-                        $("#flag").before("<button value='" + data[i].url + "' class='btn song' name='" + data[i].name + "'>" + data[i].name.substr(0, 6) + "...</button>");
+                        $("#flag").before("<button value='" + data[i].url + "' class='btn song' sname='" + data[i].name + "' name='" + data[i].name + "'>" + data[i].name.substr(0, 6) + "...</button>");
                     } else {
-                        $("#flag").before("<button value='" + data[i].url + "' class='btn song'>" + data[i].name + "</button>");
+                        $("#flag").before("<button value='" + data[i].url + "' class='btn song' sname='" + data[i].name + "'>" + data[i].name + "</button>");
                     }
                 } else {
                     if (data[i].name.length > 15) {
-                        $("#flag").before("<button value='" + data[i].url + "' class='btn song' name='" + data[i].name + "'>" + data[i].name.substr(0, 12) + "...</button>");
+                        $("#flag").before("<button value='" + data[i].url + "' class='btn song' sname='" + data[i].name + "' name='" + data[i].name + "'>" + data[i].name.substr(0, 12) + "...</button>");
                     } else {
-                        $("#flag").before("<button value='" + data[i].url + "' class='btn song'>" + data[i].name + "</button>");
+                        $("#flag").before("<button value='" + data[i].url + "' class='btn song' sname='" + data[i].name + "'>" + data[i].name + "</button>");
                     }
                 }
             }
@@ -608,6 +656,9 @@
             $(".song").click(function () {
                 var _this = this;
 
+                //点歌前清除进度条
+                $("#progressbarTwo").css("width", "0px");
+
                 //点歌前删除计时器，避免bug
                 clearInterval(set);
                 clearInterval(rotateSet);
@@ -619,29 +670,26 @@
                 //实现歌曲播放功能
                 $("#music").attr("src", song);
                 $("#music").attr("autoplay", "autoplay");
-                screen.html("00:00");
 
                 //重新调用计时器
                 jishiqi();
                 //开启旋转小特效
                 rotate();
 
-                var music = document.querySelector("#music");
                 setTwo = setInterval(function () {
+                    var music = document.querySelector("#music");
                     if (music.paused == true) {          //未播放
                         //提示用户歌曲未收录
-                        $("#play").html("亲！出错了呢！");
+                        $("#play").html("亲！歌曲被偷走了！");
                         $("#play").css("color", "#F62C59");
-                        clearInterval(set);
                         clearInterval(rotateSet);
                         end.css("display", "none");
                         start.css("display", "inline-block");
                         start.attr("disabled", true);
-                        // clearInterval(setTwo);
 
                     } else if (music.paused == false) {   //播放
                         //修改歌曲屏幕的当前播放音乐
-                        $("#play").html("当前正在播放：" + "<span style='color: #ff69b4'>" + _this.innerHTML + "</span>");
+                        $("#play").html("当前正在播放：" + "<span style='color: #ff69b4'>" + _this.getAttribute("sname") + "</span>");
                         $("#play").css("color", "rgba(58, 110, 158, 1)");
                         clearInterval(setTwo);
                     }
